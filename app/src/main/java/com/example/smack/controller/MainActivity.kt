@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -28,10 +28,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-
     private val userDataReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-
+        override fun onReceive(context: Context, intent: Intent) {
 
             runOnUiThread {
                 if (AuthService.isLoggedIn) {
@@ -41,7 +39,8 @@ class MainActivity : AppCompatActivity() {
                         resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
 
                     userImageNavHeader.setImageResource(resourceId)
-                    loginBtn.text = "LOGOUT"
+                    userImageNavHeader.setBackgroundColor(UserDataService.getColor(UserDataService.avatarColor))
+                    loginBtn.text = context.resources.getString(R.string.nav_header_logout)
 
                 } else {
                     println("!!!!!!!!!!!!")
@@ -50,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
-        userNameNavHeaderTxt.text = "!!!!!!!!!!!!!!!!!!"
+        setDefaults()
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -80,56 +78,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-
-        if (AuthService.isLoggedIn) {
-            userNameNavHeaderTxt.text = UserDataService.name
-            userEmailNavHeaderTxt.text = UserDataService.email
-            val resourceId =
-                resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
-
-            userImageNavHeader.setImageResource(resourceId)
-            loginBtn.text = "LOGOUT"
-
-        } else {
-            println("!!!!!!!!!!!!")
-        }
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-
     fun loginBtnNavClick(view: View) {
-        val logInIntent = Intent(this, LoginActivity::class.java)
-        startActivity(logInIntent)
+        if (AuthService.isLoggedIn) {
+            UserDataService.logOut()
+            setDefaults()
+        } else {
+            val logInIntent = Intent(this, LoginActivity::class.java)
+            startActivity(logInIntent)
+        }
     }
 
-
     fun addChannelClicked(view: View) {
-        startTimerThread()
-        this.runOnUiThread {
 
-            //    (findViewById<TextView>(R.id.userEmailNavHeaderTxt)).setText("New Text")
-            //findViewById(R.id.userEmailNavHeaderTxt))
-
-            userEmailNavHeaderTxt.text = "sdsdsdsdsd"
-            userEmailNavHeaderTxt.invalidate();
-            userEmailNavHeaderTxt.requestLayout();
-
-            //.text = "sdsdddsddsds!!!!!!!!!!!!1"
-            println("!!!!!!!!!!")
-        }
-        //this@MainActivity.loginBtn.post(Runnable )
     }
 
     fun sendMessageBtnClick(view: View) {
 
     }
 
-    private fun startTimerThread() {
-        val handler = Handler()
-        val runnable = Runnable {
-            handler.post { userEmailNavHeaderTxt.text = "KJSDLSJDLSDJSLDJLJD" }
-        }
-        Thread(runnable).start()
+    private fun setDefaults() {
+        userNameNavHeaderTxt.text = this.resources.getString(R.string.nav_header_title)
+        userEmailNavHeaderTxt.text = this.resources.getString(R.string.nav_header_subtitle)
+        loginBtn.text = this.resources.getString(R.string.nav_header_login)
+        userImageNavHeader.setBackgroundColor(Color.TRANSPARENT)
+
+        val resourceId =
+            resources.getIdentifier("profiledefault", "drawable", packageName)
+
+        userImageNavHeader.setImageResource(resourceId)
     }
 }

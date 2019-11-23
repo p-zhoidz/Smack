@@ -18,11 +18,11 @@
         android:layout_height="70dp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/profiledefault"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:layout_constraintBottom_toTopOf="@+id/loginBtn"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/profiledefault" />
 
     <TextView
         android:id="@+id/userNameNavHeaderTxt"
@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/nav_header_subtitle"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:layout_constraintStart_toEndOf="@+id/userImageNavHeader"
         app:layout_constraintTop_toBottomOf="@+id/userNameNavHeaderTxt" />
 
