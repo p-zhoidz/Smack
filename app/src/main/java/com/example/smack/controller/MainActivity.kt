@@ -13,6 +13,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
@@ -31,6 +32,7 @@ import com.google.android.material.navigation.NavigationView
 import io.socket.client.IO
 import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     lateinit var channelAdapter: ArrayAdapter<Channel>
+    var selectedChannel: Channel? = null
 
     private val onNewChannel = Emitter.Listener { args ->
         runOnUiThread {
@@ -73,7 +76,13 @@ class MainActivity : AppCompatActivity() {
 
                     MessageService.getChannels { complete ->
                         if (complete) {
-                            channelAdapter.notifyDataSetChanged()
+                            if (MessageService.channels.count() > 0) {
+                                selectedChannel = MessageService.channels[0]
+                                channelAdapter.notifyDataSetChanged()
+                                updateWithChannel()
+                            } else {
+
+                            }
                         }
                     }
 
@@ -82,6 +91,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun updateWithChannel() {
+        mainChannelName.text = "#${selectedChannel?.name}"
     }
 
     override fun onResume() {
@@ -130,6 +143,13 @@ class MainActivity : AppCompatActivity() {
             AuthService.findUserByEmail(this) {
 
             }
+        }
+
+        chanel_list.setOnItemClickListener { _, _, position, _ ->
+            selectedChannel = MessageService.channels[position]
+            drawer_layout.closeDrawer(GravityCompat.START)
+            updateWithChannel()
+
         }
     }
 
