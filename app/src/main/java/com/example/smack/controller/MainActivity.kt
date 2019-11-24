@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -29,12 +30,14 @@ import com.example.smack.utility.SOCKET_URL
 import com.google.android.material.navigation.NavigationView
 import io.socket.client.IO
 import io.socket.emitter.Emitter
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    lateinit var channelAdapter: ArrayAdapter<Channel>
 
     private val onNewChannel = Emitter.Listener { args ->
         runOnUiThread {
@@ -45,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             MessageService.channels.add(channel)
+            channelAdapter.notifyDataSetChanged()
 
             println(channel)
         }
@@ -65,6 +69,13 @@ class MainActivity : AppCompatActivity() {
                     userImageNavHeader.setImageResource(resourceId)
                     userImageNavHeader.setBackgroundColor(UserDataService.getColor(UserDataService.avatarColor))
                     loginBtn.text = context.resources.getString(R.string.nav_header_logout)
+
+
+                    MessageService.getChannels(context) { complete ->
+                        if (complete) {
+                            channelAdapter.notifyDataSetChanged()
+                        }
+                    }
 
                 } else {
                     println("!!!!!!!!!!!!")
@@ -107,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        setAdapters()
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataReceiver,
@@ -176,5 +189,12 @@ class MainActivity : AppCompatActivity() {
         if (inputManager.isAcceptingText) {
             inputManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         }
+    }
+
+
+    private fun setAdapters() {
+        channelAdapter =
+            ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
+        chanel_list.adapter = channelAdapter
     }
 }
