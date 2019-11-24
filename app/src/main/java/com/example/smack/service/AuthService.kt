@@ -7,16 +7,18 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.example.smack.controller.App
 import com.example.smack.utility.*
 import org.json.JSONException
 import org.json.JSONObject
 
 object AuthService {
 
+/*
     var isLoggedIn = false
     lateinit var userEmail: String
     lateinit var authToken: String
+*/
 
 
     fun registerUser(
@@ -47,7 +49,7 @@ object AuthService {
                 return requestBody.toByteArray()
             }
         }
-        Volley.newRequestQueue(context).add(registerRequest)
+        App.prefs.requestQueue.add(registerRequest)
     }
 
 
@@ -64,18 +66,18 @@ object AuthService {
             object : JsonObjectRequest(Method.POST, URL_LOGIN, null, Response.Listener {
                 try {
                     println(it)
-                    authToken = it.getString("token")
-                    userEmail = it.getString("user")
-                    isLoggedIn = true
+                    App.prefs.authToken = it.getString("token")
+                    App.prefs.userEmail = it.getString("user")
+                    App.prefs.isLoggedIn = true
 
                     findUserByEmail(context) { found ->
                         complete(found)
                     }
                 } catch (e: JSONException) {
                     Log.d("ERROR", "EXC:" + e.localizedMessage)
-                    authToken = ""
-                    userEmail = ""
-                    isLoggedIn = false
+                    App.prefs.authToken = ""
+                    App.prefs.userEmail = ""
+                    App.prefs.isLoggedIn = false
                     complete(false)
                 }
 
@@ -93,7 +95,7 @@ object AuthService {
                 }
             }
 
-        Volley.newRequestQueue(context).add(loginRequest)
+        App.prefs.requestQueue.add(loginRequest)
     }
 
 
@@ -144,11 +146,11 @@ object AuthService {
                 }
 
                 override fun getHeaders(): MutableMap<String, String> {
-                    return mutableMapOf("authorization" to "Bearer $authToken")
+                    return mutableMapOf("authorization" to "Bearer ${App.prefs.authToken}")
                 }
             }
 
-        Volley.newRequestQueue(context).add(createUserRequest)
+        App.prefs.requestQueue.add(createUserRequest)
     }
 
 
@@ -156,42 +158,48 @@ object AuthService {
 
         val findByEmailRequest =
             object :
-                JsonObjectRequest(Method.GET, "$URL_FIND_USER$userEmail", null, Response.Listener {
-                    try {
-                        println(it)
+                JsonObjectRequest(
+                    Method.GET,
+                    "$URL_FIND_USER${App.prefs.userEmail}",
+                    null,
+                    Response.Listener {
+                        try {
+                            println(it)
 
-                        UserDataService.email = it.getString("email")
-                        UserDataService.name = it.getString("name")
-                        UserDataService.id = it.getString("_id")
-                        UserDataService.avatarColor = it.getString("avatarColor")
-                        UserDataService.avatarName = it.getString("avatarName")
+                            UserDataService.email = it.getString("email")
+                            UserDataService.name = it.getString("name")
+                            UserDataService.id = it.getString("_id")
+                            UserDataService.avatarColor = it.getString("avatarColor")
+                            UserDataService.avatarName = it.getString("avatarName")
 
-                        val userDateChanged = Intent(BRAODCAST_USER_DATA_CHANGED)
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(userDateChanged)
+                            val userDateChanged = Intent(BRAODCAST_USER_DATA_CHANGED)
+                            LocalBroadcastManager.getInstance(context)
+                                .sendBroadcast(userDateChanged)
 
-                        complete(true)
-                    } catch (e: JSONException) {
-                        Log.d("ERROR", "EXC:" + e.localizedMessage)
+                            complete(true)
+                        } catch (e: JSONException) {
+                            Log.d("ERROR", "EXC:" + e.localizedMessage)
 
 
-                        UserDataService.email = ""
-                        UserDataService.name = ""
-                        UserDataService.id = ""
-                        UserDataService.avatarColor = ""
-                        UserDataService.avatarName = ""
+                            UserDataService.email = ""
+                            UserDataService.name = ""
+                            UserDataService.id = ""
+                            UserDataService.avatarColor = ""
+                            UserDataService.avatarName = ""
+                            complete(false)
+                        }
+
+                    },
+                    Response.ErrorListener { error ->
+                        Log.d("ERROR", "Could not find user: $error")
                         complete(false)
-                    }
-
-                }, Response.ErrorListener { error ->
-                    Log.d("ERROR", "Could not find user: $error")
-                    complete(false)
-                }) {
+                    }) {
                 override fun getHeaders(): MutableMap<String, String> {
-                    return mutableMapOf("authorization" to "Bearer $authToken")
+                    return mutableMapOf("authorization" to "Bearer ${App.prefs.authToken}")
                 }
             }
 
-        Volley.newRequestQueue(context).add(findByEmailRequest)
+        App.prefs.requestQueue.add(findByEmailRequest)
     }
 
 

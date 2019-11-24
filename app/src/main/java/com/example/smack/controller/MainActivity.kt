@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
 
             runOnUiThread {
-                if (AuthService.isLoggedIn) {
+                if (App.prefs.isLoggedIn) {
                     userNameNavHeaderTxt.text = UserDataService.name
                     userEmailNavHeaderTxt.text = UserDataService.email
                     val resourceId =
@@ -125,6 +125,12 @@ class MainActivity : AppCompatActivity() {
             userDataReceiver,
             IntentFilter(BRAODCAST_USER_DATA_CHANGED)
         )
+
+        if (App.prefs.isLoggedIn) {
+            AuthService.findUserByEmail(this) {
+
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -133,7 +139,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginBtnNavClick(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             UserDataService.logOut()
             setDefaults()
         } else {
@@ -144,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
     fun addChannelClicked(view: View) {
 
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
 

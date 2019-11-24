@@ -5,6 +5,7 @@ import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.example.smack.controller.App
 import com.example.smack.model.Channel
 import com.example.smack.utility.URL_CHANNELS
 import org.json.JSONException
@@ -40,7 +41,7 @@ object MessageService {
                     complete(false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
-                    return mutableMapOf("authorization" to "Bearer ${AuthService.authToken}")
+                    return mutableMapOf("authorization" to "Bearer ${App.prefs.authToken}")
                 }
 
                 override fun getBodyContentType(): String {
@@ -48,6 +49,6 @@ object MessageService {
                 }
             }
 
-        Volley.newRequestQueue(context).add(getChannelsRequest)
+        App.prefs.requestQueue.add(getChannelsRequest)
     }
 }
