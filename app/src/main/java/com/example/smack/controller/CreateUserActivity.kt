@@ -67,12 +67,11 @@ class CreateUserActivity : AppCompatActivity() {
         if (userName.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
 
 
-            AuthService.registerUser(this, email, password) {
+            AuthService.registerUser(email, password) {
                 if (it) {
                     AuthService.loginUser(this, email, password) {
                         if (it) {
                             AuthService.createUser(
-                                this,
                                 email,
                                 avatarColor,
                                 userAvatar,
@@ -84,8 +83,6 @@ class CreateUserActivity : AppCompatActivity() {
                                     LocalBroadcastManager.getInstance(this).sendBroadcast(userDateChanged)
                                     enableSpinner(false)
 
-                          /*          val mainActivity = Intent(this, MainActivity::class.java)
-                                    startActivity(mainActivity)*/
                                     finish()
                                 } else {
                                     errorToast()

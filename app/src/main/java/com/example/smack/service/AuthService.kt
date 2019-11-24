@@ -14,15 +14,7 @@ import org.json.JSONObject
 
 object AuthService {
 
-/*
-    var isLoggedIn = false
-    lateinit var userEmail: String
-    lateinit var authToken: String
-*/
-
-
     fun registerUser(
-        context: Context,
         email: String,
         password: String,
         complete: (Boolean) -> Unit
@@ -100,7 +92,6 @@ object AuthService {
 
 
     fun createUser(
-        context: Context,
         email: String,
         avatarColor: String,
         avatarName: String,

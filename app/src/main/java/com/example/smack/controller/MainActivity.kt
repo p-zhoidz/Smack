@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                     loginBtn.text = context.resources.getString(R.string.nav_header_logout)
 
 
-                    MessageService.getChannels(context) { complete ->
+                    MessageService.getChannels { complete ->
                         if (complete) {
                             channelAdapter.notifyDataSetChanged()
                         }
