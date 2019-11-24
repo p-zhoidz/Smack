@@ -79,11 +79,6 @@ class MainActivity : AppCompatActivity() {
         socket.on("channelCreated", onNewChannel)
     }
 
-    override fun onPause() {
-test1        super.onPause()
-
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataReceiver)
