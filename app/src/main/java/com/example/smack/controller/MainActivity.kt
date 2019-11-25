@@ -127,16 +127,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateWithChannel() {
+        MessageService.clearMessages()
         mainChannelName.text = "#${selectedChannel?.name}"
         if (selectedChannel != null) {
             MessageService.getMessages(selectedChannel!!.id) { complete ->
                 if (complete) {
                     for (message in MessageService.messages) {
-                        messageAdapter.notifyDataSetChanged()
                         if (messageAdapter.itemCount > 0) {
                             messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                         }
                     }
+                    messageAdapter.notifyDataSetChanged()
                 }
             }
         }
