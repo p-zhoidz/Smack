@@ -10,10 +10,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.smack.R
 import com.example.smack.model.Message
 import com.example.smack.service.UserDataService
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MessageAddapter(private val context: Context, private val messages: List<Message>) :
     RecyclerView.Adapter<MessageAddapter.MessageViewHolder>() {
     inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+
+        var formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        var parser = SimpleDateFormat("E, h:mm a", Locale.getDefault())
+
+
         private val userImage: ImageView = itemView.findViewById(R.id.messageUserImg)
         private val timeStamp: TextView = itemView.findViewById(R.id.messageTimestampeLable)
         private val userName: TextView = itemView.findViewById(R.id.messageUserNameLabel)
@@ -31,10 +39,22 @@ class MessageAddapter(private val context: Context, private val messages: List<M
             userImage.setBackgroundColor(UserDataService.getColor(message.userAvatarColor))
 
 
-            timeStamp.text = message.timeStamp
+            timeStamp.text = formatTimeStamp(message.timeStamp)
             userName.text = message.userName
             messageBody.text = message.message
 
+        }
+
+        fun formatTimeStamp(timeStamp: String): String {
+            return try {
+                timeStamp.let {
+                    formatter.parse(it)
+                }.let {
+                    parser.format(it!!)
+                }
+            } catch (e: Exception) {
+                ""
+            }
         }
 
     }
